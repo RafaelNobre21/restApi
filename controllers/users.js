@@ -1,7 +1,9 @@
+require('dotenv').config()
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const User = require('../models/User');
 const jwt = require(`jsonwebtoken`)
+const secret = process.env.JWT_TOKEN
 
   const registroSchema = Joi.object({
     email:Joi.string().email({minDomainSegments: 2, tlds:{allow: [`com`, `net`, ]}}),
@@ -29,11 +31,19 @@ const jwt = require(`jsonwebtoken`)
    if(existingUser){
        return res.status(409).json({error: "Email ja existe"})
    }
+   
    try {
-     await User.create(user)
-     res.status(201).json({msg: "Usuario criado com sucesso"})
-   } catch (error) {
+    
+      await User.create(user);
+      const token = jwt.sign({ email: user.email }, secret, { expiresIn: '1h' });
+      res.status(201).json({ msg: 'Usuario criado com sucesso', token });
+      if(!User) {
+        await User.remove(user)
+        return;
+      }
+     } catch (error) {
     console.log(error)
+    
     return res.status(500).json({error: "servidor pifou"})
    }
   }
@@ -47,11 +57,9 @@ const jwt = require(`jsonwebtoken`)
           res.status(200).json({msg: "Usuario logado com sucesso"})
         }
        else {
-        return res.status(400).json({error: "Senha invalida"})
+        return res.status(400).json({error: "Senha ou email inválida"})
        }      
-      } else {
-        return res.status(400).json({error: "Email invalida"})
-      }
+      } 
 
     } catch (error) {
       console.log(error)
