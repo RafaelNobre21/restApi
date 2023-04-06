@@ -37,13 +37,10 @@ const secret = process.env.JWT_TOKEN
       await User.create(user);
       const token = jwt.sign({ email: user.email }, secret, { expiresIn: '1h' });
       res.status(201).json({ msg: 'Usuario criado com sucesso', token });
-      if(!User) {
-        await User.remove(user)
-        return;
-      }
+     
      } catch (error) {
     console.log(error)
-    
+    await User.remove(user);
     return res.status(500).json({error: "servidor pifou"})
    }
   }
