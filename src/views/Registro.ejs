@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Registro</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <h1>Registrar</h1>
+    <% if (message) { %>
+      <p><%= message %></p>
+    <% } %>
+    <form action="/Registro" method="POST">
+      <label for="email">Email:</label>
+      <input type="email" name="email" required>
+      <br>
+      <label for="password">Senha:</label>
+      <input type="password" name="password" required>
+      <br>
+      <div>
+        <a href="/Registro"></a>
+        <button type="submit"
+        class="button">Registrar</button>
+        <a href="/Login"
+        class="button">Fazer login</a>
+      </a>
+      </div>
+     </form>
+    </body>
+    </html>

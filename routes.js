@@ -1,15 +1,28 @@
 const express = require(`express`)
 const router = express.Router()
-const user = require(`./controllers/users`)
+const user = require(`./src/controllers/users`)
+const message = user.message
+
+router.get(`/registro`, (req, res) => {
+    res.render(`Registro`, {
+        message: message
+
+    })
+})
 
 
+router.post(`/registro`, user.userRegister)
+ 
+router.post(`/login`, user.userLogin,)
 
-router.post(`/Registro`, user.userRegister)
+router.get('/login', (req, res) => {
+    res.render('Login', {
+        message: message
+    });
+});
 
-router.get(`/Login`, user.userLogin)
+router.patch(`/atualizar/:id`, user.updateUser)
 
-router.patch(`/Atualizar/:id`, user.updateUser)
-
-router.delete(`/Deletar/:id`, user.deleteUser)
+router.delete(`/deletar/:id`, user.deleteUser)
 
 module.exports = router;

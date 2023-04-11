@@ -5,6 +5,7 @@ const User = require('../models/User');
 const jwt = require(`jsonwebtoken`)
 const secret = process.env.JWT_TOKEN
 
+
   const registroSchema = Joi.object({
     email:Joi.string().email({minDomainSegments: 2, tlds:{allow: [`com`, `net`, ]}}),
     password:Joi.string().min(6).required()
@@ -13,13 +14,14 @@ const secret = process.env.JWT_TOKEN
   exports.userRegister = async (req, res) => {
    
 
-  const {email, password} = await registroSchema.validateAsync(req.body)
+  const {email, password,} = await registroSchema.validateAsync(req.body)
   if(!email){
-   return res.status(422).json({error: "email e necessario"})
+   return res.status(422).render(`Registro`,{ message: "email e necessario"})
   }
- if(!password){
-    return res.status(422).json({error: "senha e necessario"})
+ if(!password){ 
+    return res.status(422).render(`Registro`,{ message: "senha e necessario"})
  }
+ 
  const salt = await bcrypt.genSalt(10);
  const hashedPassword = await bcrypt.hash(req.body.password, salt);
    
@@ -29,19 +31,19 @@ const secret = process.env.JWT_TOKEN
    }
    const existingUser = await User.findOne({email:req.body.email});
    if(existingUser){
-       return res.status(409).json({error: "Email ja existe"})
+       return res.status(409).render(`Registro`, { message: "Email ja existe"})
    }
    
    try {
     
       await User.create(user);
       const token = jwt.sign({ email: user.email }, secret, { expiresIn: '1h' });
-      res.status(201).json({ msg: 'Usuario criado com sucesso', token });
+      res.status(201).render(`Registro`,{ message: 'Usuario criado com sucesso', token });
      
      } catch (error) {
     console.log(error)
     await User.remove(user);
-    return res.status(500).json({error: "servidor pifou"})
+    return res.status(500).render(`Registro`,{ message: "servidor pifou"})
    }
   }
    exports.userLogin = async (req, res) => {
@@ -51,16 +53,16 @@ const secret = process.env.JWT_TOKEN
       if(user){
         const check = await bcrypt.compare(req.body.password, user.password)
         if(check) {
-          res.status(200).json({msg: "Usuario logado com sucesso"})
+          res.status(200).render(`Login`,{message: "Usuario logado com sucesso"})
         }
        else {
-        return res.status(400).json({error: "Senha ou email inválida"})
+        return res.status(400).render(`Login`,{message: "Senha ou email inválida"})
        }      
       } 
 
-    } catch (error) {
-      console.log(error)
-      res.status(500).json({error: error})
+    } catch (message) {
+      console.log(message)
+      res.status(500).render(`Login`,{message: "servidor pifou"})
     }
   }
 
